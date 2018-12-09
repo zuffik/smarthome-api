@@ -12,7 +12,7 @@ namespace SmarthomeAPI
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
-                .UseUrls("http://127.0.0.1:8000")
+                .UseUrls("http://0.0.0.0:8000")
                 .UseStartup<Startup>();
     }
 }
