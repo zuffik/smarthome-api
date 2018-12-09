@@ -2,7 +2,7 @@ FROM microsoft/dotnet:sdk AS build-env
 WORKDIR /app
 
 # Copy csproj and restore as distinct layers
-COPY *.csproj ./
+COPY ./smarthome-api/*.csproj ./smarthome-api
 RUN dotnet restore
 
 # Copy everything else and build
@@ -13,5 +13,5 @@ RUN dotnet publish -c Release -o out
 FROM microsoft/dotnet:aspnetcore-runtime
 WORKDIR /app
 COPY --from=build-env /app/out .
-ENTRYPOINT ["dotnet", "aspnetapp.dll"]
+ENTRYPOINT ["dotnet", "smarthome-api.dll"]
 
