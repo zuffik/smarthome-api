@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
+// TODO: resource: https://github.com/im-0/cometblue (possible rewrite to c#)
 namespace SmarthomeAPI.App.Components.Heaters.CometBlue
 {
     public class CometBlueHeater : Heater, IHasPinCode
