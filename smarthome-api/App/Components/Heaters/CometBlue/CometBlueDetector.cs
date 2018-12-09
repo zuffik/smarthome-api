@@ -1,7 +1,8 @@
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using InTheHand.Net.Sockets;
 
 namespace SmarthomeAPI.App.Components.Heaters.CometBlue
 {
@@ -18,50 +19,22 @@ namespace SmarthomeAPI.App.Components.Heaters.CometBlue
             {
                 Data = new List<CometBlueHeater>()
             };
-            var startInfo = new ProcessStartInfo
+            var client = new BluetoothClient();
+            var devices = client.DiscoverDevicesInRange();
+            var nameRegex = new Regex(@"comet\s*blue", RegexOptions.IgnoreCase);
+            res.Data = devices.Where(d => nameRegex.IsMatch(d.DeviceName)).Select(d => new CometBlueHeater
             {
-                FileName = "cometblue",
-                Arguments = "discover",
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
-            using (var process = Process.Start(startInfo))
-            {
-                using (var reader = process?.StandardOutput)
+                Temperature = 0,
+                BaseComponent = new BaseComponent
                 {
-                    var stderr = process?.StandardError.ReadToEnd();
-                    var result = reader?.ReadToEnd();
-                    if (stderr != "")
+                    Identifier = d.DeviceAddress.ToString("C"),
+                    Name = d.DeviceName,
+                    Vendor = new Vendor
                     {
-                        throw new ComponentDetectionException(stderr);
-                    }
-
-                    var regex = new Regex(
-                        @"\(([0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2})\)",
-                        RegexOptions.IgnoreCase);
-                    var matches = regex.Matches(result);
-                    foreach (Match match in matches)
-                    {
-                        var mac = match.Groups[0].Value;
-                        var heater = new CometBlueHeater
-                        {
-                            Temperature = 0,
-                            BaseComponent = new BaseComponent
-                            {
-                                Identifier = mac,
-                                Name = mac,
-                                Vendor = new Vendor
-                                {
-                                    Name = "Comet Blue"
-                                }
-                            }
-                        };
-                        ((List<CometBlueHeater>) res.Data).Add(heater);
+                        Name = "Comet Blue"
                     }
                 }
-            }
+            }).ToList();
 
             return new Task<CommandResult>(() => res);
         }

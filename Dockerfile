@@ -2,7 +2,7 @@ FROM microsoft/dotnet:sdk AS build-env
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y pkg-config python-pip libglib2.0-dev libbluetooth-dev libboost-python-dev \
-                                         libboost-all-dev
+                                         libboost-all-dev bluez bluetooth
 RUN pip install cometblue
 
 # Copy csproj and restore as distinct layers
@@ -17,5 +17,3 @@ ENV ASPNETCORE_URLS http://+:8000
 
 EXPOSE 8000
 ENTRYPOINT ["dotnet", "smarthome-api/out/smarthome-api.dll"]
-
-
