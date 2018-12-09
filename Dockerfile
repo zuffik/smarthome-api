@@ -1,6 +1,8 @@
 FROM microsoft/dotnet:sdk AS build-env
 WORKDIR /app
 
+ADD /usr/local/bin/cometblue .
+
 # Copy csproj and restore as distinct layers
 COPY ./smarthome-api/*.csproj ./
 RUN dotnet restore
