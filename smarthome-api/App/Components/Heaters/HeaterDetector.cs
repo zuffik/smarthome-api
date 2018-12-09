@@ -30,5 +30,10 @@ namespace SmarthomeAPI.App.Components.Heaters
 
             return result;
         }
+
+        public override string Identify()
+        {
+            return "heatersDetect";
+        }
     }
 }

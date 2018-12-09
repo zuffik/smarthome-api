@@ -85,13 +85,14 @@ namespace SmarthomeAPI.Controllers
 
             try
             {
-                return Json((await controller.GetCommand<IGroupCommand>("detect").Execute()).Data);
+                return Json((await controller.GetCommand<IGroupCommand>(component + "Detect").Execute()).Data);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 return BadRequest(new JObject
                 {
-                    {"err", "Components are not detectable or have no detect command"}
+                    {"err", "Components are not detectable or have no detect command"},
+                    {"exception", JToken.FromObject(e)}
                 });
             }
         }

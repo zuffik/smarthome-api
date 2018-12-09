@@ -19,10 +19,11 @@ namespace SmarthomeAPI.App.Components.Heaters
             var list = new List<ICommand>
             {
                 new HeaterGetTemperature(),
-                new HeaterSetTemperature()
+                new HeaterSetTemperature(),
             };
             foreach (var detector in GetDetectors())
             {
+                list.Add(detector);
                 list = list.Concat(detector.GetDetectors()).ToList();
             }
 
