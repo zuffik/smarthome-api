@@ -9,6 +9,6 @@ RUN dotnet restore
 COPY . ./
 RUN dotnet publish -c Release -o out
 
-EXPOSE 5000
-ENTRYPOINT ["dotnet", "out/smarthome-api.dll"]
+EXPOSE 80
+ENTRYPOINT ["dotnet", "smarthome-api/out/smarthome-api.dll"]
 
