@@ -1,6 +1,4 @@
-using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 
 namespace SmarthomeAPI.App.Components.Heaters
 {

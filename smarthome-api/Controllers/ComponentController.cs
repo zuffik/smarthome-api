@@ -1,7 +1,8 @@
-using System.Data.Entity;
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using SmarthomeAPI.App.Components;
 
 namespace SmarthomeAPI.Controllers
@@ -19,30 +20,152 @@ namespace SmarthomeAPI.Controllers
         }
 
         [HttpGet("{component}")]
-        public JsonResult ListDevices(string component)
+        public ActionResult ListDevices(string component)
         {
-            return Json(new
+            try
             {
-                devices = _ctrls.GetController(component).GetContext().Components.ToList()
-            });
+                return Json(new
+                {
+                    devices = _ctrls.GetController(component).GetContext().Components.ToList()
+                });
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet("{component}/commands")]
-        public JsonResult ListCommands(string component)
+        public ActionResult ListCommands(string component)
         {
-            return Json(new
+            try
             {
-                commands = _ctrls.GetController(component).GetCommands().Select(c => c.Identify())
-            });
+                return Json(new
+                {
+                    commands = _ctrls.GetController(component).GetCommands().Select(c => c.Identify())
+                });
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound();
+            }
         }
 
         [HttpGet("{component}/{id}")]
-        public JsonResult DeviceInfo(string component, int id)
+        public ActionResult DeviceInfo(string component, int id)
         {
-            return Json(new
+            try
             {
-                device = _ctrls.GetController(component).GetContext().Components.First(c => c.Id == id)
-            });
+                return Json(new
+                {
+                    device = _ctrls.GetController(component).GetContext().Components.First(c => c.Id == id)
+                });
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpPost("{component}/detect")]
+        public async Task<ActionResult> DetectNewDevices(string component)
+        {
+            IComponentController controller;
+            try
+            {
+                controller = _ctrls.GetController(component);
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound(new JObject
+                {
+                    {"err", "ControllerNotFound"}
+                });
+            }
+
+            try
+            {
+                return Json((await controller.GetCommand<IGroupCommand>("detect").Execute()).Data);
+            }
+            catch (InvalidOperationException)
+            {
+                return BadRequest(new JObject
+                {
+                    {"err", "Components are not detectable or have no detect command"}
+                });
+            }
+        }
+
+        [HttpPost("{component}/{id}/{command}")]
+        public async Task<ActionResult> CommandDevice(string component, int id, string command,
+            [FromBody] JObject body)
+        {
+            IComponentController controller;
+            try
+            {
+                controller = _ctrls.GetController(component);
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound(new JObject
+                {
+                    {"err", "ControllerNotFound"}
+                });
+            }
+
+            IComponentCommand comm;
+            try
+            {
+                comm = controller.GetCommand<IComponentCommand>(command);
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound(new JObject
+                {
+                    {"err", "CommandNotFound"}
+                });
+            }
+
+            Component comp;
+            try
+            {
+                comp = controller.GetContext().Components.First(c => c.Id == id);
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound(new JObject
+                {
+                    {"err", "ComponentNotFound"}
+                });
+            }
+
+            var task = controller.GetCommander()
+                .ExecuteCommand(comp, comm, body["args"].Select(a => a.Value<object>()).ToArray());
+            if (body["shouldWait"] != null && body["shouldWait"].Value<bool>()) return null;
+            var result = await task;
+            return Json(result.Data);
+        }
+
+        [HttpPost("{component}")]
+        public ActionResult SaveDevice(string component, [FromBody] Component dto)
+
+        {
+            IComponentController controller;
+            try
+            {
+                controller = _ctrls.GetController(component);
+            }
+            catch (InvalidOperationException)
+            {
+                return NotFound(new JObject
+                {
+                    {"err", "ControllerNotFound"}
+                });
+            }
+
+            controller.GetContext().Add(dto);
+            controller.GetContext().SaveChanges();
+            return Json(dto);
         }
     }
 }

@@ -3,11 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query.Internal;
 using Microsoft.Extensions.Configuration;
 using MySql.Data.MySqlClient;
 using SmarthomeAPI.App.Components.Heaters;
-using DbContext = Microsoft.EntityFrameworkCore.DbContext;
 
 namespace SmarthomeAPI.App.Components
 {
@@ -24,18 +22,16 @@ namespace SmarthomeAPI.App.Components
         {
             Database.EnsureCreated();
         }
-        
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                IConfigurationRoot configuration = new ConfigurationBuilder()
-                    .SetBasePath(Directory.GetCurrentDirectory())
-                    .AddJsonFile("appsettings.json")
-                    .Build();
-                var connectionString = configuration.GetConnectionString("DefaultConnection");
-                optionsBuilder.UseMySQL(new MySqlConnection(connectionString));
-            }
+            if (optionsBuilder.IsConfigured) return;
+            var configuration = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json")
+                .Build();
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            optionsBuilder.UseMySQL(new MySqlConnection(connectionString));
         }
     }
 
@@ -49,7 +45,13 @@ namespace SmarthomeAPI.App.Components
     {
         ComponentContext GetContext();
         ComponentCommander GetCommander();
-        List<ICommand> GetCommands();
+        IEnumerable<ICommand> GetCommands();
+        T GetCommand<T>(string command) where T : class, ICommand;
+    }
+
+    public interface IComponentControllerWithDetector
+    {
+        IEnumerable<ComponentDetector> GetDetectors();
     }
 
     public class ComponentControllers

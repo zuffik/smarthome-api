@@ -1,3 +1,4 @@
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +14,8 @@ namespace SmarthomeAPI.App.Components
             MaxResources = _freeResources = maxResources;
         }
 
-        public async Task<CommandResult> DoWhenReady(Component component, ICommand command, object[] args = null)
+        public async Task<CommandResult> DoWhenReady(Component component, IComponentCommand componentCommand,
+            object[] args = null)
         {
             while (_freeResources == 0)
             {
@@ -21,7 +23,7 @@ namespace SmarthomeAPI.App.Components
             }
 
             _freeResources--;
-            var result = await command.Execute(component, args);
+            var result = await componentCommand.Execute(component, args);
             _freeResources++;
             return result;
         }
@@ -36,31 +38,79 @@ namespace SmarthomeAPI.App.Components
             _resourcePool = resourcePool;
         }
 
-        public async Task<CommandResult> ExecuteCommand(Component component, ICommand command, object[] args = null)
+        public async Task<CommandResult> ExecuteCommand(Component component, IComponentCommand componentCommand,
+            object[] args = null)
         {
             if (_resourcePool == null)
             {
-                return await command.Execute(component, args);
+                return await componentCommand.Execute(component, args);
             }
 
-            return await _resourcePool.DoWhenReady(component, command, args);
+            return await _resourcePool.DoWhenReady(component, componentCommand, args);
         }
     }
 
     public class CommandResult
     {
-        private object Data { get; }
+        public object Data { get; set; }
 
-        private Component Component { get; }
+        public Component Component { get; }
 
         public CommandResult(object data, Component component)
         {
             Data = data;
             Component = component;
         }
+
+        public CommandResult(object data)
+        {
+            Data = data;
+        }
+
+        public CommandResult()
+        {
+        }
+    }
+
+    public static class CheckArgs
+    {
+        public static bool AreNotNull(object[] args = null)
+        {
+            return args != null;
+        }
+
+        public static bool HaveExactlyLength(int count, object[] args = null)
+        {
+            return AreNotNull(args) && args?.Length == count;
+        }
+
+        public static WrongArgumentsException GetException(string command, string constraints)
+        {
+            return new WrongArgumentsException($"Arguments for {command} must {constraints}");
+        }
+    }
+
+    public class WrongArgumentsException : Exception
+    {
+        public WrongArgumentsException()
+        {
+        }
+
+        public WrongArgumentsException(string message) : base(message)
+        {
+        }
     }
 
     public interface ICommand : IIdentifiable
+    {
+    }
+
+    public interface IGroupCommand : ICommand
+    {
+        Task<CommandResult> Execute(object[] args = null);
+    }
+
+    public interface IComponentCommand : ICommand
     {
         Task<CommandResult> Execute(Component component, object[] args = null);
     }

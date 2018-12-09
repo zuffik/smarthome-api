@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace SmarthomeAPI.App.Components.Heaters
@@ -8,7 +9,7 @@ namespace SmarthomeAPI.App.Components.Heaters
         {
         }
     }
-    
+
     public class HeaterCommander : ComponentCommander
     {
         public HeaterCommander(ComponentResourcePool resourcePool = null) : base(resourcePool)
@@ -16,29 +17,36 @@ namespace SmarthomeAPI.App.Components.Heaters
         }
     }
 
-    public class HeaterGetTemperature : ICommand
+    public class HeaterGetTemperature : IComponentCommand
     {
         public string Identify()
         {
             return "heaterGetTemperature";
         }
 
-        public async Task<CommandResult> Execute(Component component, object[] args = null)
+        public Task<CommandResult> Execute(Component component, object[] args = null)
         {
-            return new CommandResult(10, component);
+            var temperature = ((Heater) component).GetTemperature();
+            return new Task<CommandResult>(() => new CommandResult(temperature, component));
         }
     }
 
-    public class HeaterSetTemperature : ICommand
+    public class HeaterSetTemperature : IComponentCommand
     {
         public string Identify()
         {
             return "heaterSetTemperature";
         }
 
-        public async Task<CommandResult> Execute(Component component, object[] args = null)
+        public Task<CommandResult> Execute(Component component, object[] args = null)
         {
-            return new CommandResult(false, component);
+            if (!CheckArgs.HaveExactlyLength(1, args))
+            {
+                throw CheckArgs.GetException(Identify(), "have at least 1 argument");
+            }
+
+            var didSet = ((Heater) component).SetTemperature(Convert.ToDouble(args?[0]));
+            return new Task<CommandResult>(() => new CommandResult(didSet, component));
         }
     }
 }
