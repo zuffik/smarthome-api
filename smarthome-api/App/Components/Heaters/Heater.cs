@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace SmarthomeAPI.App.Components.Heaters
 {
@@ -7,23 +8,9 @@ namespace SmarthomeAPI.App.Components.Heaters
         public int Temperature { get; set; }
     }
     
-    public abstract class Heater : HeaterDto
+    public abstract class Heater : HeaterDto, IHasTemperature
     {
-        public abstract bool SetTemperature(double temperature);
-
-        public abstract double GetTemperature();
-    }
-
-    public class CometBlue : Heater
-    {
-        public override bool SetTemperature(double temperature)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override double GetTemperature()
-        {
-            throw new NotImplementedException();
-        }
+        public abstract Task<bool> SetTemperature(double temperature);
+        public abstract Task<double> GetTemperature();
     }
 }

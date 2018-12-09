@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Threading.Tasks;
 
 namespace SmarthomeAPI.App.Components
 {
@@ -23,5 +24,16 @@ namespace SmarthomeAPI.App.Components
         [Key] public int Id { get; set; }
         public int BaseComponentId { get; set; }
         public BaseComponent BaseComponent { get; set; }
+    }
+
+    public interface IHasTemperature
+    {
+        Task<bool> SetTemperature(double temperature);
+        Task<double> GetTemperature();
+    }
+
+    public interface IHasPinCode
+    {
+        string GetPin();
     }
 }

@@ -97,6 +97,9 @@ namespace SmarthomeAPI.Controllers
         }
 
         [HttpPost("{component}/{id}/{command}")]
+        [HttpGet("{component}/{id}/{command}")]
+        [HttpDelete("{component}/{id}/{command}")]
+        [HttpPut("{component}/{id}/{command}")]
         public async Task<ActionResult> CommandDevice(string component, int id, string command,
             [FromBody] JObject body)
         {
