@@ -1,7 +1,10 @@
 FROM microsoft/dotnet:sdk AS build-env
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y bluez
+RUN apt install glib2.0
+RUN wget http://www.kernel.org/pub/linux/bluetooth/bluez-4.101.tar.gz && tar xvzf bluez-4.101.tar.gz
+RUN cd bluez-4.101 && ./configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var \
+    --libexecdir=/lib && make && make install
 
 # Copy csproj and restore as distinct layers
 COPY ./smarthome-api/*.csproj ./
