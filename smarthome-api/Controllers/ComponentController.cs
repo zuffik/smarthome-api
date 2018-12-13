@@ -7,18 +7,70 @@ using SmarthomeAPI.App.Components;
 
 namespace SmarthomeAPI.Controllers
 {
+    /// <summary>
+    /// This controller manages any devices or components, which are known to application. Route for this controller is
+    /// prefixed with `/component`.
+    /// </summary>
     [Route("component")]
     [ApiController]
     public class ComponentController : Controller
     {
         private ComponentControllers _ctrls = ComponentControllers.Instance;
 
+        /// <summary>
+        /// **GET** `/component/types`
+        /// Json with all components types that are known.
+        /// </summary>
+        /// <example>
+        /// **Example request:** `GET /component/types`
+        /// **Example response:**
+        /// ```
+        /// {
+        ///     "types": [
+        ///         "heaters"
+        ///     ]
+        /// }
+        /// ```
+        /// </example>
+        /// <returns>Json with all components types that are known.</returns>
         [HttpGet("types")]
         public JsonResult GetComponentTypes()
         {
             return Json(new {types = _ctrls.Controllers.Select(c => c.Identify())});
         }
 
+        /// <summary>
+        /// **GET** `/component/{component}`
+        /// Lists devices of certain type. As `component` part can be any type returned from
+        /// <see cref="ComponentController.GetComponentTypes">`GET /component/types`</see>.
+        /// </summary>
+        /// <example>
+        /// **Example request:** `GET /component/heaters`
+        /// **Example response:**
+        /// ```
+        /// {
+        ///     "devices": [
+        ///         {
+        ///             "Id": 1,
+        ///             "BaseComponentId": 1,
+        ///             "Temperature": 21.5,
+        ///             "BaseComponent": {
+        ///                 "Id": 1,
+        ///                 "Identifier": "00:11:22:33:44:55",
+        ///                 "Name": "Kitchen in home",
+        ///                 "VendorId": "2",
+        ///                 "Vendor": {
+        ///                     "Id": 2,
+        ///                     "Name": "Comet Blue"
+        ///                 }
+        ///             }
+        ///         },
+        ///         ...
+        ///     ]
+        /// }
+        /// ```
+        /// </example>
+        /// <returns>List devices of certain type.</returns>
         [HttpGet("{component}")]
         public ActionResult ListDevices(string component)
         {
@@ -35,6 +87,24 @@ namespace SmarthomeAPI.Controllers
             }
         }
 
+        /// <summary>
+        /// **GET** `/component/{component}/commands`
+        /// Lists commands that can be executed on certain component type. As `component` part can be any type returned
+        /// from <see cref="ComponentController.GetComponentTypes">`GET /component/types`</see>.
+        /// </summary>
+        /// <example>
+        /// **Example request:** `GET /component/heaters/commands`
+        /// **Example response:**
+        /// ```
+        /// {
+        ///     "commands": [
+        ///         "heaterGetTemperature",
+        ///         "heaterSetTemperature"
+        ///     ]
+        /// }
+        /// ```
+        /// </example>
+        /// <returns>List of commands.</returns>
         [HttpGet("{component}/commands")]
         public ActionResult ListCommands(string component)
         {

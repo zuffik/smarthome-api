@@ -1,6 +1,5 @@
-using System.Collections.Generic;
+using System;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using InTheHand.Net.Sockets;
 
@@ -15,28 +14,31 @@ namespace SmarthomeAPI.App.Components.Heaters.CometBlue
 
         public Task<CommandResult> Execute(object[] args = null)
         {
-            var res = new CommandResult
+            try
             {
-                Data = new List<CometBlueHeater>()
-            };
-            var client = new BluetoothClient();
-            var devices = client.DiscoverDevicesInRange();
-            var nameRegex = new Regex(@"comet\s*blue", RegexOptions.IgnoreCase);
-            res.Data = devices.Where(d => nameRegex.IsMatch(d.DeviceName)).Select(d => new CometBlueHeater
-            {
-                Temperature = 0,
-                BaseComponent = new BaseComponent
+                return new Task<CommandResult>(() => new CommandResult
                 {
-                    Identifier = d.DeviceAddress.ToString("C"),
-                    Name = d.DeviceName,
-                    Vendor = new Vendor
+                    Data = new BluetoothClient().DiscoverDevices().Select(device => new CometBlueHeater
                     {
-                        Name = "Comet Blue"
-                    }
-                }
-            }).ToList();
-
-            return new Task<CommandResult>(() => res);
+                        BaseComponent =
+                        {
+                            Identifier = device.DeviceAddress.ToString("C"),
+                            Name = device.DeviceName,
+                            Vendor =
+                            {
+                                Id = (int) Vendors.HEATER_COMET_BLUE,
+                                Name = "Comet Blue"
+                            },
+                            VendorId = (int) Vendors.HEATER_COMET_BLUE
+                        }
+                    })
+                });
+            }
+            catch (PlatformNotSupportedException e)
+            {
+                throw new ComponentDetectionException(
+                    $"Unsupported platform or bluetooth client not found. (Reason: '${e.Message}')");
+            }
         }
     }
 }

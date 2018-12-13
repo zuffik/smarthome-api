@@ -1,9 +1,7 @@
 FROM microsoft/dotnet:sdk AS build-env
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y pkg-config python-pip libglib2.0-dev libbluetooth-dev libboost-python-dev \
-                                         libboost-all-dev bluez bluetooth
-RUN pip install cometblue
+RUN apt-get update && apt-get install -y bluez
 
 # Copy csproj and restore as distinct layers
 COPY ./smarthome-api/*.csproj ./
