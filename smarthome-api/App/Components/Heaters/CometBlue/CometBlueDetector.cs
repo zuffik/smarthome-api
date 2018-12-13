@@ -18,7 +18,7 @@ namespace SmarthomeAPI.App.Components.Heaters.CometBlue
             {
                 return new Task<CommandResult>(() => new CommandResult
                 {
-                    Data = new BluetoothClient().DiscoverDevices().Select(device => new CometBlueHeater
+                    Data = new BluetoothClient().DiscoverDevices(5).Select(device => new CometBlueHeater
                     {
                         BaseComponent =
                         {
