@@ -12,7 +12,7 @@ namespace SmarthomeAPI.App.Components.Heaters
 
         public ComponentContext GetContext() => new HeaterContext();
 
-        public ComponentCommander GetCommander() => new HeaterCommander();
+        public ComponentCommander GetCommander() => new HeaterCommander(new HeaterResourcePool(3));
 
         public IEnumerable<ICommand> GetCommands()
         {

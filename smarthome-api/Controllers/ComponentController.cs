@@ -155,7 +155,8 @@ namespace SmarthomeAPI.Controllers
 
             try
             {
-                return Json((await controller.GetCommand<IGroupCommand>(component + "Detect").Execute()).Data);
+                return Json((await controller.GetCommander()
+                    .ExecuteCommand(controller.GetCommand<IGroupCommand>(component + "Detect"))).Data);
             }
             catch (InvalidOperationException e)
             {

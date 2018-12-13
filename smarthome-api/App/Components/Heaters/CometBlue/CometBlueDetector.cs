@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using InTheHand.Net.Sockets;
@@ -12,11 +13,11 @@ namespace SmarthomeAPI.App.Components.Heaters.CometBlue
             return "heaterDetectCometBlue";
         }
 
-        public Task<CommandResult> Execute(object[] args = null)
+        public async Task<CommandResult> Execute(object[] args = null)
         {
             try
             {
-                return new Task<CommandResult>(() => new CommandResult
+                return new CommandResult
                 {
                     Data = new BluetoothClient().DiscoverDevices(5).Select(device => new CometBlueHeater
                     {
@@ -32,7 +33,7 @@ namespace SmarthomeAPI.App.Components.Heaters.CometBlue
                             VendorId = (int) Vendors.HEATER_COMET_BLUE
                         }
                     })
-                });
+                };
             }
             catch (PlatformNotSupportedException e)
             {

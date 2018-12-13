@@ -27,6 +27,20 @@ namespace SmarthomeAPI.App.Components
             _freeResources++;
             return result;
         }
+
+        public async Task<CommandResult> DoWhenReady(IGroupCommand componentCommand,
+            object[] args = null)
+        {
+            while (_freeResources == 0)
+            {
+                Thread.Sleep(200);
+            }
+
+            _freeResources--;
+            var result = await componentCommand.Execute(args);
+            _freeResources++;
+            return result;
+        }
     }
 
     public abstract class ComponentCommander
@@ -38,15 +52,26 @@ namespace SmarthomeAPI.App.Components
             _resourcePool = resourcePool;
         }
 
-        public async Task<CommandResult> ExecuteCommand(Component component, IComponentCommand componentCommand,
+        public async Task<CommandResult> ExecuteCommand(Component component, IComponentCommand command,
             object[] args = null)
         {
             if (_resourcePool == null)
             {
-                return await componentCommand.Execute(component, args);
+                return await command.Execute(component, args);
             }
 
-            return await _resourcePool.DoWhenReady(component, componentCommand, args);
+            return await _resourcePool.DoWhenReady(component, command, args);
+        }
+
+        public async Task<CommandResult> ExecuteCommand(IGroupCommand command,
+            object[] args = null)
+        {
+            if (_resourcePool == null)
+            {
+                return await command.Execute(args);
+            }
+
+            return await _resourcePool.DoWhenReady(command, args);
         }
     }
 
