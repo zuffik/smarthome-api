@@ -24,7 +24,7 @@ namespace SmarthomeAPI.App.Components.Heaters.CometBlue
                 var startInfo = new ProcessStartInfo
                 {
                     FileName = "timeout",
-                    Arguments = "15s hcitool lescan",
+                    Arguments = "-s SIGINT 10 hcitool lescan",
                     UseShellExecute = false,
                     RedirectStandardError = true,
                     RedirectStandardOutput = true,
@@ -67,7 +67,7 @@ namespace SmarthomeAPI.App.Components.Heaters.CometBlue
                                         VendorId = (int) Vendors.HEATER_COMET_BLUE
                                     }
                                 };
-                            })
+                            }).ToList<Heater>()
                         };
                     }
                 }

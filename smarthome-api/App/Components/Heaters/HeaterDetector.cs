@@ -24,8 +24,9 @@ namespace SmarthomeAPI.App.Components.Heaters
             };
             foreach (var detector in GetDetectors())
             {
-                result.Data = ((List<Heater>) result.Data).Concat((await detector.Execute(args)).Data as List<Heater> ??
-                                                                  throw new NullReferenceException());
+                result.Data = ((List<Heater>) result.Data).Concat(
+                    (await detector.Execute(args)).Data as IEnumerable<Heater> ?? throw new NullReferenceException()
+                );
             }
 
             return result;
