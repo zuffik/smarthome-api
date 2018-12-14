@@ -12,7 +12,6 @@ namespace SmarthomeAPI.Controllers
     /// prefixed with `/component`.
     /// </summary>
     [Route("component")]
-    [ApiController]
     public class ComponentController : Controller
     {
         private ComponentControllers _ctrls = ComponentControllers.Instance;
