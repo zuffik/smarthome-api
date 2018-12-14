@@ -17,6 +17,7 @@ namespace SmarthomeAPI.App.Components.Heaters.CometBlue
 
         public async Task<CommandResult> Execute(object[] args = null)
         {
+            // WARNING: Platform dependent
             // timeout 15s hcitool lescan
             try
             {
@@ -35,7 +36,7 @@ namespace SmarthomeAPI.App.Components.Heaters.CometBlue
                     {
                         var stderr = process?.StandardError.ReadToEnd();
                         var result = reader?.ReadToEnd();
-                        if (string.IsNullOrEmpty(stderr))
+                        if (!string.IsNullOrEmpty(stderr))
                         {
                             throw new ComponentDetectionException(
                                 $"Error happened during discovery. (Reason: '{stderr}')");
@@ -71,15 +72,15 @@ namespace SmarthomeAPI.App.Components.Heaters.CometBlue
                     }
                 }
             }
-            catch (NullReferenceException e)
-            {
-                throw new ComponentDetectionException(
-                    $"Error happened during discovery. (Reason: '{e.Message}')");
-            }
             catch (PlatformNotSupportedException e)
             {
                 throw new ComponentDetectionException(
-                    $"Unsupported platform or bluetooth client not found. (Reason: '{e.Message}')");
+                    $"Unsupported platform or bluetooth client not found. (Reason: '{e.Message}' ({e.GetType()} {e})");
+            }
+            catch (Exception e)
+            {
+                throw new ComponentDetectionException(
+                    $"General error happened. (Reason: '{e.Message}' ({e.GetType()} {e}))");
             }
         }
     }
