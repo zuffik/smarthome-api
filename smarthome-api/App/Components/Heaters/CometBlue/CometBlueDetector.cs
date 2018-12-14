@@ -21,11 +21,11 @@ namespace SmarthomeAPI.App.Components.Heaters.CometBlue
                 {
                     Data = new BluetoothClient().DiscoverDevices(5).Select(device => new CometBlueHeater
                     {
-                        BaseComponent =
+                        BaseComponent = new BaseComponent
                         {
                             Identifier = device.DeviceAddress.ToString("C"),
                             Name = device.DeviceName,
-                            Vendor =
+                            Vendor = new Vendor
                             {
                                 Id = (int) Vendors.HEATER_COMET_BLUE,
                                 Name = "Comet Blue"
