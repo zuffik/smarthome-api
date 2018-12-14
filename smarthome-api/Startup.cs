@@ -32,7 +32,7 @@ namespace SmarthomeAPI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<HeaterContext>();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc();
         }
 
         /// <summary>
@@ -44,13 +44,6 @@ namespace SmarthomeAPI
         /// <param name="env"></param>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (!env.IsDevelopment())
-            {
-                app.UseHsts();
-                app.UseHttpsRedirection();
-                
-            }
-
             app.UseExceptionHandler(errorApp =>
             {
                 errorApp.Run(async context =>
