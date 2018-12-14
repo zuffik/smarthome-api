@@ -48,6 +48,7 @@ namespace SmarthomeAPI
             {
                 app.UseHsts();
                 app.UseHttpsRedirection();
+                
             }
 
             app.UseExceptionHandler(errorApp =>
