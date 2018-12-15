@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SmarthomeAPI.App.Components.Heaters.CometBlue;
 
 namespace SmarthomeAPI.App.Components.Heaters
 {
@@ -12,6 +13,12 @@ namespace SmarthomeAPI.App.Components.Heaters
 
         public HeaterContext(DbContextOptions options) : base(options)
         {
+        }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            builder.Entity<CometBlueHeater>();
+            base.OnModelCreating(builder);
         }
     }
 }
