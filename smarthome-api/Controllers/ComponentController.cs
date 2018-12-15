@@ -84,7 +84,7 @@ namespace SmarthomeAPI.Controllers
             {
                 return NotFound(new JObject
                 {
-                    {"error", new JObject(e)}
+                    {"error", e.Message}
                 });
             }
         }
@@ -121,7 +121,7 @@ namespace SmarthomeAPI.Controllers
             {
                 return NotFound(new JObject
                 {
-                    {"error", new JObject(e)}
+                    {"error", e.Message}
                 });
             }
         }
@@ -140,7 +140,7 @@ namespace SmarthomeAPI.Controllers
             {
                 return NotFound(new JObject
                 {
-                    {"error", new JObject(e)}
+                    {"error", e.Message}
                 });
             }
         }
@@ -158,7 +158,7 @@ namespace SmarthomeAPI.Controllers
                 return NotFound(new JObject
                 {
                     {"err", "ControllerNotFound"},
-                    {"error", new JObject(e)}
+                    {"error", e.Message}
                 });
             }
 
@@ -172,7 +172,7 @@ namespace SmarthomeAPI.Controllers
                 return BadRequest(new JObject
                 {
                     {"err", "Components are not detectable or have no detect command"},
-                    {"error", new JObject(e)}
+                    {"error", e.Message}
                 });
             }
         }
@@ -194,7 +194,7 @@ namespace SmarthomeAPI.Controllers
                 return NotFound(new JObject
                 {
                     {"err", "ControllerNotFound"},
-                    {"error", new JObject(e)}
+                    {"error", e.Message}
                 });
             }
 
@@ -208,7 +208,7 @@ namespace SmarthomeAPI.Controllers
                 return NotFound(new JObject
                 {
                     {"err", "CommandNotFound"},
-                    {"error", new JObject(e)}
+                    {"error", e.Message}
                 });
             }
 
@@ -222,7 +222,7 @@ namespace SmarthomeAPI.Controllers
                 return NotFound(new JObject
                 {
                     {"err", "ComponentNotFound"},
-                    {"error", new JObject(e)}
+                    {"error", e.Message}
                 });
             }
 
@@ -247,7 +247,7 @@ namespace SmarthomeAPI.Controllers
                 return NotFound(new JObject
                 {
                     {"err", "ControllerNotFound"},
-                    {"error", new JObject(e)}
+                    {"error", e.Message}
                 });
             }
 
