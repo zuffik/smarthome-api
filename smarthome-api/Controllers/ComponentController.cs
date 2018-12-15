@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using SmarthomeAPI.App.Components;
 
@@ -77,7 +78,8 @@ namespace SmarthomeAPI.Controllers
             {
                 return Json(new
                 {
-                    devices = _ctrls.GetController(component).GetContext().Components.ToList()
+                    devices = _ctrls.GetController(component).GetContext().Components.Include(c => c.BaseComponent)
+                        .Include(c => c.BaseComponent.Vendor).ToList()
                 });
             }
             catch (InvalidOperationException e)
@@ -97,7 +99,8 @@ namespace SmarthomeAPI.Controllers
             {
                 return Json(new
                 {
-                    devices = _ctrls.Controllers.ToDictionary(con => con.Identify(), con => con.GetContext().Components)
+                    devices = _ctrls.Controllers.ToDictionary(con => con.Identify(), con => con.GetContext().Components
+                        .Include(c => c.BaseComponent).Include(c => c.BaseComponent.Vendor).ToList())
                 });
             }
             catch (InvalidOperationException e)
@@ -153,7 +156,8 @@ namespace SmarthomeAPI.Controllers
             {
                 return Json(new
                 {
-                    device = _ctrls.GetController(component).GetContext().Components.First(c => c.Id == id)
+                    device = _ctrls.GetController(component).GetContext().Components.Include(c => c.BaseComponent)
+                        .Include(c => c.BaseComponent.Vendor).First(c => c.Id == id)
                 });
             }
             catch (InvalidOperationException e)
@@ -235,7 +239,8 @@ namespace SmarthomeAPI.Controllers
             Component comp;
             try
             {
-                comp = controller.GetContext().Components.First(c => c.Id == id);
+                comp = controller.GetContext().Components.Include(c => c.BaseComponent)
+                    .Include(c => c.BaseComponent.Vendor).First(c => c.Id == id);
             }
             catch (InvalidOperationException e)
             {
