@@ -80,9 +80,12 @@ namespace SmarthomeAPI.Controllers
                     devices = _ctrls.GetController(component).GetContext().Components.ToList()
                 });
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
-                return NotFound();
+                return NotFound(new JObject
+                {
+                    {"error", new JObject(e)}
+                });
             }
         }
 
@@ -114,9 +117,12 @@ namespace SmarthomeAPI.Controllers
                     commands = _ctrls.GetController(component).GetCommands().Select(c => c.Identify())
                 });
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
-                return NotFound();
+                return NotFound(new JObject
+                {
+                    {"error", new JObject(e)}
+                });
             }
         }
 
@@ -130,9 +136,12 @@ namespace SmarthomeAPI.Controllers
                     device = _ctrls.GetController(component).GetContext().Components.First(c => c.Id == id)
                 });
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
-                return NotFound();
+                return NotFound(new JObject
+                {
+                    {"error", new JObject(e)}
+                });
             }
         }
 
@@ -144,11 +153,12 @@ namespace SmarthomeAPI.Controllers
             {
                 controller = _ctrls.GetController(component);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 return NotFound(new JObject
                 {
-                    {"err", "ControllerNotFound"}
+                    {"err", "ControllerNotFound"},
+                    {"error", new JObject(e)}
                 });
             }
 
@@ -162,7 +172,7 @@ namespace SmarthomeAPI.Controllers
                 return BadRequest(new JObject
                 {
                     {"err", "Components are not detectable or have no detect command"},
-                    {"exception", JToken.FromObject(e)}
+                    {"error", new JObject(e)}
                 });
             }
         }
@@ -179,11 +189,12 @@ namespace SmarthomeAPI.Controllers
             {
                 controller = _ctrls.GetController(component);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 return NotFound(new JObject
                 {
-                    {"err", "ControllerNotFound"}
+                    {"err", "ControllerNotFound"},
+                    {"error", new JObject(e)}
                 });
             }
 
@@ -192,11 +203,12 @@ namespace SmarthomeAPI.Controllers
             {
                 comm = controller.GetCommand<IComponentCommand>(command);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 return NotFound(new JObject
                 {
-                    {"err", "CommandNotFound"}
+                    {"err", "CommandNotFound"},
+                    {"error", new JObject(e)}
                 });
             }
 
@@ -205,11 +217,12 @@ namespace SmarthomeAPI.Controllers
             {
                 comp = controller.GetContext().Components.First(c => c.Id == id);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 return NotFound(new JObject
                 {
-                    {"err", "ComponentNotFound"}
+                    {"err", "ComponentNotFound"},
+                    {"error", new JObject(e)}
                 });
             }
 
@@ -229,11 +242,12 @@ namespace SmarthomeAPI.Controllers
             {
                 controller = _ctrls.GetController(component);
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException e)
             {
                 return NotFound(new JObject
                 {
-                    {"err", "ControllerNotFound"}
+                    {"err", "ControllerNotFound"},
+                    {"error", new JObject(e)}
                 });
             }
 

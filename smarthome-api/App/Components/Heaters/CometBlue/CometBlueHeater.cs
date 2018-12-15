@@ -1,22 +1,64 @@
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-// TODO: resource: https://github.com/im-0/cometblue (possible rewrite to c#)
 namespace SmarthomeAPI.App.Components.Heaters.CometBlue
 {
     public class CometBlueHeater : Heater, IHasPinCode
     {
-        public override Task<bool> SetTemperature(double temperature)
+        public override async Task<bool> SetTemperature(double temperature)
         {
-            throw new NotImplementedException();
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "cometblue",
+                Arguments = $"device -p {GetPin()} {BaseComponent.Identifier} set temperatures {temperature}",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            using (var process = Process.Start(startInfo))
+            {
+                var stderr = process?.StandardError.ReadToEnd();
+                if (stderr != "")
+                {
+                    throw new ComponentDetectionException(stderr);
+                }
+
+                process.WaitForExit();
+                return process.ExitCode == 0;
+            }
         }
 
-        public override Task<double> GetTemperature()
+        public override async Task<double> GetTemperature()
         {
-            throw new NotImplementedException();
+            var startInfo = new ProcessStartInfo
+            {
+                FileName = "cometblue",
+                Arguments = $"device -p {GetPin()} {BaseComponent.Identifier} get temperatures",
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            using (var process = Process.Start(startInfo))
+            {
+                using (var reader = process?.StandardOutput)
+                {
+                    var stderr = process?.StandardError.ReadToEnd();
+                    var result = reader?.ReadToEnd();
+                    if (stderr != "")
+                    {
+                        throw new ComponentDetectionException(stderr);
+                    }
+
+                    var regex = new Regex(
+                        @"Current temperature: (\d*\.\d*) °C",
+                        RegexOptions.IgnoreCase);
+                    var m = regex.Match(result);
+                    return double.Parse(m.Value);
+                }
+            }
         }
 
         public string GetPin()
