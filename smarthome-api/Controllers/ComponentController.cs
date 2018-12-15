@@ -89,6 +89,26 @@ namespace SmarthomeAPI.Controllers
             }
         }
 
+        [HttpGet("/")]
+        [HttpGet("all")]
+        public ActionResult ListAllDevices()
+        {
+            try
+            {
+                return Json(new
+                {
+                    devices = _ctrls.Controllers.ToDictionary(con => con.Identify(), con => con.GetContext().Components)
+                });
+            }
+            catch (InvalidOperationException e)
+            {
+                return NotFound(new JObject
+                {
+                    {"error", e.Message}
+                });
+            }
+        }
+
         /// <summary>
         /// **GET** `/component/{component}/commands`
         /// Lists commands that can be executed on certain component type. As `component` part can be any type returned
